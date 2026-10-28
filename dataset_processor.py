@@ -22,24 +22,26 @@ def count_pieces_excluding_kings(board: chess.Board) -> int:
 
 def parse_and_evaluate_game(
     game: chess.pgn.Game, engine: chess.engine.SimpleEngine, time_limit: float = 0.05
-) -> dict:
-    """To parse a PGN game, evaluate moves with Stockfish, and extract phase-segmented metrics."""
+) -> list:
+    """To parse a PGN game, evaluate moves with Stockfish, and extract phase-segmented metrics including blunder rates."""
     headers = game.headers
     board = game.board()
 
-    # Storage for move metrics per color
+    # 1. Initialize blunder counters
     metrics = {
         chess.WHITE: {
             "cpl_opening": [],
             "cpl_middlegame": [],
             "cpl_endgame": [],
             "cpl_all": [],
+            "blunder_count": 0,
         },
         chess.BLACK: {
             "cpl_opening": [],
             "cpl_middlegame": [],
             "cpl_endgame": [],
             "cpl_all": [],
+            "blunder_count": 0,
         },
     }
 
@@ -59,8 +61,14 @@ def parse_and_evaluate_game(
         score_after_obj = info_after["score"].pov(current_color)
         score_after = score_after_obj.score(mate_score=10000)
 
-        # To calculate raw CPL and apply maximum cap (300 cp)
+        # To calculate raw CPL
         raw_cpl = max(0, score_before - score_after)
+        
+        # 2. Evaluates blunder threshold (raw_cpl >= 300 cp / decisive piece or advantage loss)
+        if raw_cpl >= 300:
+            metrics[current_color]["blunder_count"] += 1
+
+        # Capped CPL for global averages
         capped_cpl = min(raw_cpl, 300)
 
         # To determine game phase
@@ -77,42 +85,35 @@ def parse_and_evaluate_game(
 
         move_index += 1
 
-    # To calculate summary statistics for White and Black
+    # 3. Constructs final record output including blunder_count and blunder_rate
     results = []
-    for color, color_name in [(chess.WHITE, "White"), (chess.BLACK, "Black")]:
-        cpl_all = metrics[color]["cpl_all"]
-        cpl_op = metrics[color]["cpl_opening"]
-        cpl_mid = metrics[color]["cpl_middlegame"]
-        cpl_end = metrics[color]["cpl_endgame"]
+    for color in [chess.WHITE, chess.BLACK]:
+        all_moves = metrics[color]["cpl_all"]
+        total_moves = len(all_moves)
+        blunders = metrics[color]["blunder_count"]
+        
+        # Blunder rate per 100 moves
+        blunder_rate = (blunders / total_moves * 100) if total_moves > 0 else 0.0
 
-        if not cpl_all:
-            continue
+        color_str = "White" if color == chess.WHITE else "Black"
+        player_name = headers.get(color_str, "Unknown")
+        player_elo = headers.get(f"{color_str}Elo", "0")
 
-        mean_acpl = sum(cpl_all) / len(cpl_all)
-        median_cpl = pd.Series(cpl_all).median()
-        std_cpl = pd.Series(cpl_all).std() if len(cpl_all) > 1 else 0.0
-
-        results.append(
-            {
-                "site": headers.get("Site", "N/A"),
-                "date": headers.get("Date", "N/A"),
-                "player_color": color_name,
-                "player_name": headers.get(color_name, "Unknown"),
-                "player_elo": int(headers.get(f"{color_name}Elo", 0)),
-                "acpl_global": round(mean_acpl, 2),
-                "median_cpl": round(median_cpl, 2),
-                "std_cpl": round(std_cpl, 2),
-                "acpl_opening": round(sum(cpl_op) / len(cpl_op), 2)
-                if cpl_op
-                else None,
-                "acpl_middlegame": round(sum(cpl_mid) / len(cpl_mid), 2)
-                if cpl_mid
-                else None,
-                "acpl_endgame": round(sum(cpl_end) / len(cpl_end), 2)
-                if cpl_end
-                else None,
-            }
-        )
+        results.append({
+            "site": headers.get("Site", ""),
+            "date": headers.get("UTCDate", ""),
+            "player_color": color_str,
+            "player_name": player_name,
+            "player_elo": player_elo,
+            "acpl_global": sum(all_moves) / total_moves if total_moves > 0 else None,
+            "median_cpl": float(pd.Series(all_moves).median()) if total_moves > 0 else None,
+            "std_cpl": float(pd.Series(all_moves).std()) if total_moves > 0 else None,
+            "blunder_count": blunders,
+            "blunder_rate": round(blunder_rate, 2),
+            "acpl_opening": sum(metrics[color]["cpl_opening"]) / len(metrics[color]["cpl_opening"]) if metrics[color]["cpl_opening"] else None,
+            "acpl_middlegame": sum(metrics[color]["cpl_middlegame"]) / len(metrics[color]["cpl_middlegame"]) if metrics[color]["cpl_middlegame"] else None,
+            "acpl_endgame": sum(metrics[color]["cpl_endgame"]) / len(metrics[color]["cpl_endgame"]) if metrics[color]["cpl_endgame"] else None,
+        })
 
     return results
 
@@ -120,7 +121,7 @@ def parse_and_evaluate_game(
 # To execute test execution if run directly
 if __name__ == "__main__":
     stockfish_path = "./stockfish.exe"
-    pgn_filename = "sample.pgn"
+    pgn_filename = "lichess_sample.pgn"
 
     engine = chess.engine.SimpleEngine.popen_uci(stockfish_path)
 

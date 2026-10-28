@@ -1,0 +1,12 @@
+[Event "Rated Blitz game"]
+[Site "https://lichess.org/abcd1234"]
+[Date "2026.01.15"]
+[White "Player_A"]
+[Black "Player_B"]
+[Result "1-0"]
+[WhiteElo "1210"]
+[BlackElo "1195"]
+[TimeControl "180+0"]
+[Termination "Normal"]
+
+1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. c3 Nf6 5. d4 exd4 6. cxd4 Bb4+ 7. Bd2 Bxd2+ 8. Nbxd2 d5 9. exd5 Nxd5 10. Qb3 Nce7 11. O-O O-O 12. Rfe1 c6 13. a4 1-0
