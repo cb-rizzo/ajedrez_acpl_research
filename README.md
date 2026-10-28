@@ -28,17 +28,10 @@ graph TD
     C -->|Aggregated Metrics Export| D[chess_acpl_cohorts.csv]
     D -->|Statistical EDA & Visualization| E[eda.ipynb Notebook]
 
-⚡ Engine Configuration & Execution Notes
+    ⚡ Engine Configuration & Execution Notes
 Evaluation Depth / Limits: Stockfish evaluations run with a fixed limit per position (e.g., depth=12 or time_limit=0.1s), balancing analytical accuracy with evaluation speed.
 
 Concurrency: Stream parsing and UCI engine evaluation are structured to allow scalable multi-threading across processing cores.
-
-Metrics Processed:
-Median CPL & Standard Deviation: Robust measurement of baseline precision and move-to-move volatility.
-
-Blunder Rate (%): Percentage of moves resulting in severe tactical errors (>= 300 CP).
-
-Phase-Segmented CPL: Accuracy segmented across Opening, Middlegame, and Endgame transitions.
 
 Metrics Processed:
 Median CPL & Standard Deviation: Robust measurement of baseline precision and move-to-move volatility.
@@ -57,18 +50,15 @@ Phase-Segmented CPL: Accuracy segmented across Opening, Middlegame, and Endgame 
 ├── requirements.txt       # Project dependencies
 └── README.md              # Project documentation
 
-## 🚀 Setup & Execution
-
-1. **Environment Setup:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt```
+🚀 Setup & Execution
+Environment Setup:
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
 
 Stockfish Binary:
 Download Stockfish 16 and place the executable binary (stockfish.exe or stockfish) in the project root directory.
 
 Run Pipeline & Analysis:
-```bash
 python build_datasets.py
-jupyter notebook```
+jupyter notebook
