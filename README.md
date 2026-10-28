@@ -27,6 +27,7 @@ graph TD
     B -->|UCI Protocol Engine Evaluation| C[dataset_processor.py - Stockfish 16]
     C -->|Aggregated Metrics Export| D[chess_acpl_cohorts.csv]
     D -->|Statistical EDA & Visualization| E[eda.ipynb Notebook]
+    ```
 
     ⚡ Engine Configuration & Execution Notes
 Evaluation Depth / Limits: Stockfish evaluations run with a fixed limit per position (e.g., depth=12 or time_limit=0.1s), balancing analytical accuracy with evaluation speed.
