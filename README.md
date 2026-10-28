@@ -20,7 +20,7 @@ Using Stockfish UCI engine integration, the pipeline extracts move evaluations t
 ## 🛠️ Data Pipeline & Architecture
 
 The project emphasizes efficient stream processing and metric extraction from raw chess archives:
-
+```text
 Lichess Compressed Data (.pgn.zst)
        │
        ▼ (Streaming / Chunking)
@@ -34,6 +34,7 @@ chess_acpl_cohorts.csv
        │
        ▼ (Statistical EDA & Visuals)
 eda.ipynb Notebook
+```
 
 ### ⚡ Engine Configuration & Execution Notes
 Evaluation Depth / Limits: Stockfish evaluations run with a fixed limit per position (e.g., depth=12 or time_limit=0.1s), balancing analytical accuracy with evaluation speed.
