@@ -21,13 +21,19 @@ Using Stockfish UCI engine integration, the pipeline extracts move evaluations t
 
 The project emphasizes efficient stream processing and metric extraction from raw chess archives:
 
-```mermaid
-graph TD
-    A["Lichess Compressed Data (.pgn.zst)"] -->|"Streaming / Chunking"| B["fetch_open_data.py / build_datasets.py"]
-    B -->|"UCI Protocol Engine Evaluation"| C["dataset_processor.py - Stockfish 16"]
-    C -->|"Aggregated Metrics Export"| D["chess_acpl_cohorts.csv"]
-    D -->|"Statistical EDA & Visualization"| E["eda.ipynb Notebook"]
-    ```
+Lichess Compressed Data (.pgn.zst)
+       │
+       ▼ (Streaming / Chunking)
+fetch_open_data.py / build_datasets.py
+       │
+       ▼ (UCI Protocol Engine Evaluation)
+dataset_processor.py (Stockfish 16)
+       │
+       ▼ (Aggregated Metrics Export)
+chess_acpl_cohorts.csv
+       │
+       ▼ (Statistical EDA & Visuals)
+eda.ipynb Notebook
 
 ### ⚡ Engine Configuration & Execution Notes
 Evaluation Depth / Limits: Stockfish evaluations run with a fixed limit per position (e.g., depth=12 or time_limit=0.1s), balancing analytical accuracy with evaluation speed.
