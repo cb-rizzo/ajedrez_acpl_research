@@ -41,6 +41,8 @@ The project emphasizes efficient stream processing and metric extraction from ra
 ---
 
 ## 💻 Repository Structure
+
+```text
 .
 ├── fetch_open_data.py    # Streaming utility for compressed zstd Lichess datasets
 ├── dataset_processor.py  # Stockfish UCI evaluation engine & metric calculation
@@ -48,7 +50,7 @@ The project emphasizes efficient stream processing and metric extraction from ra
 ├── eda.ipynb             # Exploratory Data Analysis & visual plots
 ├── chess_acpl_cohorts.csv # Evaluated output dataset
 └── README.md             # Documentation
----
+```
 
 ## 🚀 Setup & Execution
 
