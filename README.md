@@ -1,81 +1,66 @@
-# Comparative Research on Chess Skill Evolution & ELO Deflation (2019 vs 2026)
+# Lichess Data Pipeline & Tactical Precision Analysis (2019 vs 2026)
 
-An empirical data science investigation analyzing tactical precision, Centipawn Loss (CPL) distributions, and game-phase mechanics on Lichess open data using Stockfish evaluation pipelines.
-
----
-
-## 📌 Executive Summary
-
-This project investigates the widespread community hypothesis of **ELO deflation** on online chess platforms (Lichess). By evaluating historical games from 2019 against 2026 data through Stockfish UCI engine analysis, we mapped the calibration curve of player ratings against tactical accuracy metrics.
-
-### Key Finding: The Asymmetric Modern Player Profile
-* **Quantifiable ELO Deflation (~150–200 points):** The median baseline precision (Median CPL ≈ 30) of a **1200 ELO player in 2019** currently aligns with a **~1000 ELO player in 2026**.
-* **Tactical Volatility & Blunder Asymmetry:** Despite possessing equivalent foundational precision and opening knowledge, calibrated sub-samples reveal that the modern **1000 ELO player exhibits a slightly higher Blunder Rate (CPL >= 300)** than the historical 1200 ELO player (~13% vs ~10%).
+A Data Science and Engineering project built in Python to process and analyze large-scale compressed Lichess game archives (`.pgn.zst`), evaluating move precision and error rates across historical cohorts using Stockfish 16.
 
 ---
 
-## 🔬 Methodology & Architecture
+## 📌 Project Overview
 
-The analytical pipeline is built in Python, leveraging a memory-efficient streaming design to process compressed Lichess open data blocks (`.pgn.zst`).
-[ Lichess Open Data Stream (.pgn.zst) ]
-│
-▼
-[ fetch_open_data.py / build_datasets.py ] ──► Cohort Filtering & Range Sampling
-│
-▼
-[ dataset_processor.py ]               ──► Stockfish 16 Engine Evaluation (UCI)
-│
-▼
-[ chess_acpl_cohorts.csv ]          ──► Consolidated Metrics Pipeline
-│
-▼
-[ eda.ipynb ]                    ──► ELO Calibration & Statistical Analytics
+This project explores historical variations in player move accuracy (Centipawn Loss - CPL) on Lichess between 2019 and 2026. 
 
-### Metrics Tracked:
-1. **Average Centipawn Loss (ACPL):** Global average move accuracy (capped at 300 CP).
-2. **Median CPL & Standard Deviation (`std_cpl`):** Measures baseline accuracy and tactical inconsistency/volatility.
-3. **Blunder Rate (%):** Percentage of total moves yielding a loss of >= 300 centipawns (decisive piece/advantage blunders).
-4. **Phase-Segmented ACPL:** Partitioned evaluations across Opening (Moves 1–10), Middlegame, and Endgame.
+Using Stockfish UCI engine integration, the pipeline extracts move evaluations to compare baseline precision, error volatility, and blunder rates across rating brackets.
+
+### Key Observations & Technical Highlights
+* **ELO vs. Precision Observations:** In our sampled cohorts, modern ~1000 ELO players display median baseline precision ($\text{Median CPL} \approx 30$) comparable to ~1200 ELO players from 2019, though overall rating dynamics involve broader ecosystem variables.
+* **Error Volatility:** While overall move accuracy aligns closely between calibrated cohorts, modern lower-bracket samples show a slightly higher blunder frequency ($\text{CPL} \ge 300$) under time pressure ($\sim 13\%$ vs $\sim 10\%$).
+* **Data Engineering Focus:** Efficient processing of compressed PGN streams without loading full datasets into memory.
 
 ---
 
-## 📊 Analytical Insights & Results
+## 🛠️ Data Pipeline & Architecture
 
-### 1. ELO Calibration Curve (Deflation Mapping)
-By expanding the 2026 sample across an extended spectrum (800–1300 ELO), the regression curve demonstrates that current ratings require higher tactical precision to sustain equivalent ELO milestones compared to 2019.
-
-### 2. Paired Sub-sample Comparison (1200 ELO '19 vs 1000 ELO '26)
-* **Opening & Theory:** Modern players display higher theory retention in opening phases due to accessible online resources and engines.
-* **Middlegame Complexity:** The increased theoretical accuracy leads to sharper middlegame structures, driving higher tactical friction and resulting in elevated blunder spikes under time pressure.
+The project emphasizes efficient stream processing and metric extraction from raw chess archives:
+[ Lichess Compressed Data (.pgn.zst) ]
+│
+▼ (Streaming / Chunking)
+[ fetch_open_data.py / build_datasets.py ]
+│
+▼ (Stockfish UCI Engine Evaluation)
+[ dataset_processor.py ]
+│
+▼
+[ chess_acpl_cohorts.csv ]
+│
+▼
+[ eda.ipynb ] (Statistical Exploration & Visuals)
+### Metrics Processed:
+* **Median CPL & Standard Deviation:** Robust measurement of baseline precision and move-to-move volatility.
+* **Blunder Rate (%):** Percentage of moves resulting in severe tactical errors ($\ge 300\text{ CP}$).
+* **Phase-Segmented CPL:** Accuracy segmented across Opening, Middlegame, and Endgame transitions.
 
 ---
 
 ## 💻 Repository Structure
 .
-├── fetch_open_data.py    # Streaming utility for Lichess compressed zstd datasets
-├── dataset_processor.py  # Stockfish parsing engine, CPL evaluation & blunder calculator
+├── fetch_open_data.py    # Streaming utility for compressed zstd Lichess datasets
+├── dataset_processor.py  # Stockfish UCI evaluation engine & metric calculation
 ├── build_datasets.py     # Cohort extraction and multi-year dataset builder
-├── eda.ipynb             # Jupyter Notebook containing exploratory data analytics & charts
-├── chess_acpl_cohorts.csv # Evaluated dataset output
-└── README.md             # Project documentation
-
+├── eda.ipynb             # Exploratory Data Analysis & visual plots
+├── chess_acpl_cohorts.csv # Evaluated output dataset
+└── README.md             # Documentation
 ---
 
-## 🛠️ Setup & Execution
+## 🚀 Setup & Execution
 
 1. **Environment Setup:**
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install chess zstandard requests pandas matplotlib seaborn jupyter
+   Stockfish Binary:
+   Download Stockfish 16 and place the binary in the root directory.
 
-   Download Stockfish:
-   Place the executable binary (stockfish.exe or stockfish) in the project root directory.
-
-   Build Dataset:
+   Run Pipeline & Analysis:
    Bash
    python build_datasets.py
-
-   Run Analysis Notebook:
-   Bash
    jupyter notebook
