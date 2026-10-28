@@ -2,33 +2,33 @@ import chess.pgn
 
 pgn_filename = "sample.pgn"
 
-# 1. Abrir y parsear el archivo PGN
+# Open and parse PGN file
 with open(pgn_filename, encoding="utf-8") as pgn_file:
     game = chess.pgn.read_game(pgn_file)
 
-    # 2. Extraer metadatos del encabezado
+    # Extract header metadata
     headers = game.headers
-    white_player = headers.get("White", "Desconocido")
-    black_player = headers.get("Black", "Desconocido")
+    white_player = headers.get("White", "Unknown")
+    black_player = headers.get("Black", "Unknown")
     white_elo = headers.get("WhiteElo", "N/A")
     black_elo = headers.get("BlackElo", "N/A")
 
-    print(f"Partida: {white_player} ({white_elo}) vs {black_player} ({black_elo})")
+    print(f"Game: {white_player} ({white_elo}) vs {black_player} ({black_elo})")
     print("-" * 50)
 
-    # 3. Recorrer el tablero e imprimir posiciones FEN
+    # Traverse board positions and print FEN strings
     board = game.board()
     move_number = 1
 
     for move in game.mainline_moves():
         board.push(move)
 
-        # Imprimimos solo las primeras 6 jugadas para ver el formato
+        # Print only first 6 moves to verify format
         if move_number <= 6:
-            print(f"Jugada {move_number}: {move.uci()}")
-            print(f"Posición FEN: {board.fen()}")
+            print(f"Move {move_number}: {move.uci()}")
+            print(f"FEN position: {board.fen()}")
             print("-" * 30)
 
         move_number += 1
 
-    print(f"\nProceso completado. Total de jugadas: {move_number - 1}")
+    print(f"\nProcess completed. Total moves: {move_number - 1}")
