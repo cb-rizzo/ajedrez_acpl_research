@@ -11,8 +11,8 @@ This project explores historical variations in player move accuracy (Centipawn L
 Using Stockfish UCI engine integration, the pipeline extracts move evaluations to compare baseline precision, error volatility, and blunder rates across rating brackets.
 
 ### Key Observations & Technical Highlights
-* **ELO vs. Precision Observations:** In our sampled cohorts, modern ~1000 ELO players display median baseline precision ($\text{Median CPL} \approx 30$) comparable to ~1200 ELO players from 2019, though overall rating dynamics involve broader ecosystem variables.
-* **Error Volatility:** While overall move accuracy aligns closely between calibrated cohorts, modern lower-bracket samples show a slightly higher blunder frequency ($\text{CPL} \ge 300$) under time pressure ($\sim 13\%$ vs $\sim 10\%$).
+* **ELO vs. Precision Observations:** In our sampled cohorts, modern ~1000 ELO players display median baseline precision (Median CPL ≈ 30) comparable to ~1200 ELO players from 2019, though overall rating dynamics involve broader ecosystem variables.
+* **Error Volatility:** While overall move accuracy aligns closely between calibrated cohorts, modern lower-bracket samples show a slightly higher blunder frequency (CPL >= 300 CP) under time pressure (~13% vs ~10%).
 * **Data Engineering Focus:** Efficient processing of compressed PGN streams without loading full datasets into memory.
 
 ---
@@ -20,35 +20,42 @@ Using Stockfish UCI engine integration, the pipeline extracts move evaluations t
 ## 🛠️ Data Pipeline & Architecture
 
 The project emphasizes efficient stream processing and metric extraction from raw chess archives:
-[ Lichess Compressed Data (.pgn.zst) ]
-│
-▼ (Streaming / Chunking)
-[ fetch_open_data.py / build_datasets.py ]
-│
-▼ (Stockfish UCI Engine Evaluation)
-[ dataset_processor.py ]
-│
-▼
-[ chess_acpl_cohorts.csv ]
-│
-▼
-[ eda.ipynb ] (Statistical Exploration & Visuals)
-### Metrics Processed:
-* **Median CPL & Standard Deviation:** Robust measurement of baseline precision and move-to-move volatility.
-* **Blunder Rate (%):** Percentage of moves resulting in severe tactical errors ($\ge 300\text{ CP}$).
-* **Phase-Segmented CPL:** Accuracy segmented across Opening, Middlegame, and Endgame transitions.
 
----
+```mermaid
+graph TD
+    A[Lichess Compressed Data .pgn.zst] -->|Streaming / Chunking| B[fetch_open_data.py / build_datasets.py]
+    B -->|UCI Protocol Engine Evaluation| C[dataset_processor.py - Stockfish 16]
+    C -->|Aggregated Metrics Export| D[chess_acpl_cohorts.csv]
+    D -->|Statistical EDA & Visualization| E[eda.ipynb Notebook]
 
-## 💻 Repository Structure
+⚡ Engine Configuration & Execution Notes
+Evaluation Depth / Limits: Stockfish evaluations run with a fixed limit per position (e.g., depth=12 or time_limit=0.1s), balancing analytical accuracy with evaluation speed.
+
+Concurrency: Stream parsing and UCI engine evaluation are structured to allow scalable multi-threading across processing cores.
+
+Metrics Processed:
+Median CPL & Standard Deviation: Robust measurement of baseline precision and move-to-move volatility.
+
+Blunder Rate (%): Percentage of moves resulting in severe tactical errors (>= 300 CP).
+
+Phase-Segmented CPL: Accuracy segmented across Opening, Middlegame, and Endgame transitions.
+
+Metrics Processed:
+Median CPL & Standard Deviation: Robust measurement of baseline precision and move-to-move volatility.
+
+Blunder Rate (%): Percentage of moves resulting in severe tactical errors (>= 300 CP).
+
+Phase-Segmented CPL: Accuracy segmented across Opening, Middlegame, and Endgame transitions.
+
+💻 Repository Structure
 .
-├── fetch_open_data.py    # Streaming utility for compressed zstd Lichess datasets
-├── dataset_processor.py  # Stockfish UCI evaluation engine & metric calculation
-├── build_datasets.py     # Cohort extraction and multi-year dataset builder
-├── eda.ipynb             # Exploratory Data Analysis & visual plots
+├── fetch_open_data.py     # Streaming utility for compressed zstd Lichess datasets
+├── dataset_processor.py   # Stockfish UCI evaluation engine & metric calculation
+├── build_datasets.py      # Cohort extraction and multi-year dataset builder
+├── eda.ipynb              # Exploratory Data Analysis & visual plots
 ├── chess_acpl_cohorts.csv # Evaluated output dataset
-└── README.md             # Documentation
----
+├── requirements.txt       # Project dependencies
+└── README.md              # Project documentation
 
 ## 🚀 Setup & Execution
 
@@ -56,11 +63,12 @@ The project emphasizes efficient stream processing and metric extraction from ra
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install chess zstandard requests pandas matplotlib seaborn jupyter
-   Stockfish Binary:
-   Download Stockfish 16 and place the binary in the root directory.
+   pip install -r requirements.txt```
 
-   Run Pipeline & Analysis:
-   Bash
-   python build_datasets.py
-   jupyter notebook
+Stockfish Binary:
+Download Stockfish 16 and place the executable binary (stockfish.exe or stockfish) in the project root directory.
+
+Run Pipeline & Analysis:
+```bash
+python build_datasets.py
+jupyter notebook```
