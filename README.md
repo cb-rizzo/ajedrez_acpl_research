@@ -48,7 +48,9 @@ Blunder Rate (%): Percentage of moves resulting in severe tactical errors (>= 30
 
 Phase-Segmented CPL: Accuracy segmented across Opening, Middlegame, and Endgame transitions.
 
-💻 Repository Structure
+## 💻 Repository Structure
+
+```text
 .
 ├── fetch_open_data.py     # Streaming utility for compressed zstd Lichess datasets
 ├── dataset_processor.py   # Stockfish UCI evaluation engine & metric calculation
@@ -57,16 +59,20 @@ Phase-Segmented CPL: Accuracy segmented across Opening, Middlegame, and Endgame 
 ├── chess_acpl_cohorts.csv # Evaluated output dataset
 ├── requirements.txt       # Project dependencies
 └── README.md              # Project documentation
+```
 
-🚀 Setup & Execution
-Environment Setup:
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
+## 🚀 Setup & Execution
 
-Stockfish Binary:
-Download Stockfish 16 and place the executable binary (stockfish.exe or stockfish) in the project root directory.
-
-Run Pipeline & Analysis:
-python build_datasets.py
-jupyter notebook
+1. **Environment Setup:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+   Stockfish Binary:
+   Download Stockfish 16 and place the executable binary (stockfish.exe or stockfish) in the project root directory.
+   Run Pipeline & Analysis:
+   ```bash
+   python build_datasets.py
+   jupyter notebook
+```
